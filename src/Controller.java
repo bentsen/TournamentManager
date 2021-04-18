@@ -1,10 +1,13 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Scanner;
 
-public class Data
+public class Controller
 {
     Scanner scan = new Scanner(System.in);
     Tournament tournament;
@@ -211,7 +214,7 @@ public class Data
 
     public void createTournament()
     {
-        if(Main.tourChoose == 0) {
+        if(Main.tourChoose > 0) {
             if (Main.tournaments.size() < 6) {
                 System.out.println("Type tournament name");
                 System.out.print("\nUserInput: ");
@@ -250,63 +253,104 @@ public class Data
 
     }
 
-    public void deleteTournament() //mangler stadig at slette hold fra txt filerne
+    public void deleteTournament() 
     {
         int i = 0;
+        System.out.println("\nTOURNAMENTS:\n");
         for(Tournament t : Main.tournaments)
         {
-            System.out.println( i+1 + "tournament saved: \n");
-            System.out.println(t + "\n");
+
+            System.out.println((i + 1) + "." + t + "\n");
+            i++;
+        }
             System.out.println("\n" + "Choose tournament to delete");
-            System.out.println("\nUserInput: ");
-            int tourDelete = scan.nextInt();
-            System.out.println("Confirm delete, type " + Main.tournaments.get(tourDelete -1) + " or q for retreat");
             System.out.print("\nUserInput: ");
-            String confirmDelete = scan.nextLine();
-            if(confirmDelete.equals(Main.tournaments.toString()))
+            int tourDelete = scan.nextInt();
+            System.out.println("\nConfirm delete, type " + Main.tournaments.get(tourDelete -1) + " or q for retreat");
+            System.out.print("\nUserInput: ");
+            Scanner confirm = new Scanner(System.in);
+            String confirmDelete = confirm.nextLine();
+
+
+            if(confirmDelete.equals(Main.tournaments.get(tourDelete - 1).tournamentName))
             {
-                Main.tournaments.remove(tourDelete -1);
-                System.out.println( Main.tournaments.get(tourDelete -1) + " has now been deleted");
+                String tournamentName = Main.tournaments.get(tourDelete-1).getTournamentName();
+                //Delete tournament from arraylist
+                Main.tournaments.remove((tourDelete -1));
+                System.out.println( "Tournament "+ tournamentName + " has now been deleted");
+
                 //Delete tournament from txt file
-                try {
+                try
+                {
                     File inputFile = new File("src/Tournaments/Tournaments.txt");
-                    File tempFile = new File("myTempFile.txt");
+                    File tempFile = new File("src/Tournaments/tempTournaments.txt");
 
                     BufferedReader reader = new BufferedReader(new FileReader(inputFile));
                     BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
-                    String lineToRemove = confirmDelete;
+                    int lineToRemove = tourDelete;
                     String currentLine;
+                    int count = 0;
 
                     while ((currentLine = reader.readLine()) != null)
                     {
-                        //Trims newline when comparing with lineToRemove
-                        String trimmedLine = currentLine.trim();
-                        if (trimmedLine.equals(lineToRemove)) continue;
+                        count++;
+                        if(count == lineToRemove)
+                        {
+                            continue;
+                        }
                         writer.write(currentLine + System.getProperty("line.separator"));
                     }
                     writer.close();
-                    writer.close();
+                    reader.close();
                     inputFile.delete();
-                    boolean succesful = tempFile.renameTo(inputFile);
+                    tempFile.renameTo(inputFile);
+
+                }
+                catch (IOException ex)
+                {
+                    ex.printStackTrace();
+                }
+
+                //Delete match txt to that tournament
+                try
+                {
+                FileWriter writer = new FileWriter("src/Matches/match" + tourDelete + ".txt",false);
+                PrintWriter writer2 = new PrintWriter(writer,false);
+                writer2.flush();
+                writer2.close();
+                writer.close();
                 }
                 catch (IOException e)
                 {
-                    System.out.println("Could not delete tournament from files");
+                    e.printStackTrace();
                 }
-                return;
+
+                //Delete team txt to that tournament
+                try
+                {
+                    FileWriter writer = new FileWriter("src/Teams/Teams" + tourDelete +".txt");
+                    PrintWriter writer2 = new PrintWriter(writer,false);
+                    writer2.flush();
+                    writer2.close();
+                    writer.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
             else if(confirmDelete.equals("q"))
             {
-                return;
+
             }
             else
             {
-                System.out.println("This is not a valid option");
-                return;
+                System.out.println("Wrong typing");
             }
 
-        }
+
+
     }
 
     public void saveMatchData() {

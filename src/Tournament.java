@@ -3,11 +3,12 @@ import java.util.ArrayList;
 public class Tournament {
     String tournamentName;
     Match match;
-    Data data = new Data();
+    Controller data = new Controller();
     UI ui;
     ArrayList<Match> matches = new ArrayList<>();
     ArrayList<Team> teames = new ArrayList<>();
     ArrayList<Team> currentTeams = new ArrayList<>();
+
     public Tournament(String tournamentName, ArrayList<Match> matches, ArrayList<Team> teams, ArrayList<Team> currentTeams)
     {
         this.tournamentName = tournamentName;
@@ -16,12 +17,15 @@ public class Tournament {
         this.currentTeams = new ArrayList<>();
     }
 
-    public Tournament(){
+    public Tournament()
+    {
 
     }
 
-
-
+    public String getTournamentName()
+    {
+        return tournamentName;
+    }
 
     @Override
     public String toString() {

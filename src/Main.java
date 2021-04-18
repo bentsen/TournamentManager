@@ -1,15 +1,12 @@
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.*;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.security.cert.PKIXBuilderParameters;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 public class Main {
+
     public static  UI ui;
+
     public static ArrayList<Team> teams = new ArrayList<>();
     public static ArrayList<Match> matches = new ArrayList<>();
     public static ArrayList<Team> currentTeams = new ArrayList<>();
@@ -17,16 +14,17 @@ public class Main {
     public static ArrayList<Match> Finals = new ArrayList<>();
     public static ArrayList<Match> semifinals = new ArrayList<>();
     public static ArrayList<Tournament> tournaments = new ArrayList<>();
+
     public static int tourChoose = 0;
-    public static void main(String[] args){
+
+    public static void main(String[] args)
+    {
 
         tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
         continueTournament();
         ui = new UI();
         ui.mainInterface();
         Main.matches.get(0).getTeam1Goals();
-
-
     }
 
     public static void continueTournament() {
@@ -100,7 +98,8 @@ public class Main {
         }
         else if(input == i+1)
         {
-            Data data = new Data();
+            tourChoose = input -1;
+            Controller data = new Controller();
             data.createTournament();
         }
         else
@@ -169,8 +168,9 @@ public class Main {
                 boolean knockedOut = Boolean.parseBoolean(colonSeperatedValues[1]);
                 teamList.add(new Team(teamName,knockedOut));
             }
-        }
 
+        }
+        scanner.close();
         return teamList;
     }
 
@@ -248,12 +248,13 @@ public class Main {
                     i++;
                 }
 
+
                 int team1Goal = Integer.parseInt(colonSeperatedValues[2]);
                 int team2Goal = Integer.parseInt(colonSeperatedValues[3]);
                 matchList.add(new Match(team1,team2,team1Goal,team2Goal));
             }
         }
-
+        scanner.close();
         return matchList;
     }
 
@@ -275,8 +276,9 @@ public class Main {
 
                 tournamentList.add(new Tournament(tourName,matches,teams,currentTeams));
             }
-        }
 
+        }
+        scanner.close();
         return tournamentList;
     }
 

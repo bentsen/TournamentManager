@@ -1,18 +1,16 @@
-import java.io.*;
-import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.*;
+
 public class UI
 {
     Scanner interfaceScan = new Scanner(System.in);
     int userInput;
-    Data data = new Data();
+    Controller data = new Controller();
     Tournament tour = new Tournament();
 
     public void mainInterface()
     {
 
-        System.out.println("\nMAIN INTERFACE");
+        System.out.println("\nMAIN INTERFACE - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Team menu");
         System.out.println(" 2.Match menu");
         System.out.println(" 3.Tournament menu");
@@ -42,7 +40,8 @@ public class UI
 
     public void teamMenu()
     {
-        System.out.println("\nTEAM MENU");
+
+        System.out.println("\nTEAM MENU - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Register team");
         System.out.println(" 2.Delete team");
         System.out.println(" 3.View all teams registered");
@@ -76,7 +75,8 @@ public class UI
 
     public void matchMenu()
     {
-        System.out.println("\nMATCH MENU");
+
+        System.out.println("\nMATCH MENU - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Create Matches");
         System.out.println(" 2.Register match results");
         System.out.println(" 3.Back to menu");
@@ -134,11 +134,12 @@ public class UI
 
     public void tournamentMenu()
     {
-        System.out.println("\nTOURNAMENT MENU");
+
+        System.out.println("\nTOURNAMENT MENU - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Create tournament");
-        System.out.println(" 2.Delete tournament");
-        System.out.println(" 3.Tournament placements");
-        System.out.println(" 4.Tournament match schedule");
+        System.out.println(" 2.Delete tournament"); //skal kigges på
+        System.out.println(" 3.Tournament placements"); //skal kigges på
+        System.out.println(" 4.Tournament match schedule"); //skal kigges på
         System.out.println(" 5.Tournament simulation");
         System.out.println(" 6.Back to menu");
         System.out.print("UserInput: ");
@@ -175,9 +176,6 @@ public class UI
         }
 
     }
-
-
-
 
     public void tournamentPlacement()
     {
