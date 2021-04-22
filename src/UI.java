@@ -10,7 +10,7 @@ public class UI
     public void mainInterface()
     {
 
-        System.out.println("\nMAIN INTERFACE - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
+        System.out.println("\nMAIN INTERFACE - TOURNAMENT " + Main.DBTournament.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Team menu");
         System.out.println(" 2.Match menu");
         System.out.println(" 3.Tournament menu");
@@ -40,8 +40,7 @@ public class UI
 
     public void teamMenu()
     {
-
-        System.out.println("\nTEAM MENU - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
+        System.out.println("\nTEAM MENU - TOURNAMENT " + Main.DBTournament.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Register team");
         System.out.println(" 2.Delete team");
         System.out.println(" 3.View all teams registered");
@@ -76,7 +75,7 @@ public class UI
     public void matchMenu()
     {
 
-        System.out.println("\nMATCH MENU - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
+        System.out.println("\nMATCH MENU - TOURNAMENT " + Main.DBTournament.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Create Matches");
         System.out.println(" 2.Register match results");
         System.out.println(" 3.Back to menu");
@@ -88,23 +87,23 @@ public class UI
         {
             case 1:
                 if(Main.currentTeams.size() == 0) {
-                    data.randomMatchUps(Main.teams, Main.matches);
+                    data.randomMatchUps(Main.DBTeams, Main.DBMatches);
                 }
                 else if(Main.currentTeams.size() == 8) {
-                    data.randomMatchUps(Main.currentTeams, Main.quarterFinals);
+                    data.randomMatchUps(Main.currentTeams, Main.currentMatches);
                 }
                 else if(Main.currentTeams.size() == 4) {
-                    data.randomMatchUps(Main.currentTeams, Main.semifinals);
+                    data.randomMatchUps(Main.currentTeams, Main.currentMatches);
                 }
                 else if(Main.currentTeams.size() == 2) {
-                    data.randomMatchUps(Main.currentTeams, Main.Finals);
+                    data.randomMatchUps(Main.currentTeams, Main.currentMatches);
                 }
                 mainInterface();
                 break;
             case 2:
-                if(Main.currentTeams.size() == 0) {
+                if(Main.currentTeams.size() == 16) {
                     System.out.println("Jeg har lavet hold i matches");
-                    data.registerMatches(Main.matches);
+                    data.registerMatches(Main.DBMatches);
                 }
                 else if(Main.currentTeams.size() == 8) {
                     System.out.println("Jeg har lavet hold i quaterfinals");
@@ -122,7 +121,7 @@ public class UI
                 mainInterface();
                 break;
             case 4:
-                Main.matches = Main.readMatchData("src/match.txt");
+                //Main.matches = Main.readMatchData("src/match.txt");
                 System.out.println(Main.matches);
                 break;
             default:
@@ -135,7 +134,7 @@ public class UI
     public void tournamentMenu()
     {
 
-        System.out.println("\nTOURNAMENT MENU - TOURNAMENT " + Main.tournaments.get(Main.tourChoose).getTournamentName().toUpperCase());
+        System.out.println("\nTOURNAMENT MENU - TOURNAMENT " + Main.DBTournament.get(Main.tourChoose).getTournamentName().toUpperCase());
         System.out.println(" 1.Create tournament");
         System.out.println(" 2.Delete tournament"); //skal kigges på
         System.out.println(" 3.Tournament placements"); //skal kigges på

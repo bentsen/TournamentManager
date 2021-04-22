@@ -4,17 +4,26 @@ import java.util.Collections;
 public class Match {
     Team team1;
     Team team2;
+    String Team1Name;
+    String Team2name;
     int team1Goals;
     int team2Goals;
     UI ui;
+    int id;
+    int tournament_id;
+    boolean active = true;
 
-    public Match(Team team1, Team team2, int team1Goals, int team2Goals)
+    public Match(String Team1Name, String Team2name, int id ,int tournament_id, int team1Goals, int team2Goals,boolean active)
     {
-        this.team1 = team1;
-        this.team2 = team2;
+        this.active = active;
+        this.Team1Name = Team1Name;
+        this.Team2name = Team2name;
+        this.tournament_id = tournament_id;
         this.team1Goals = team1Goals;
         this.team2Goals = team2Goals;
     }
+
+    public Match(Team Team1Name, Team Team2name, int id ,int tournament_id, int team1Goals, int team2Goals,boolean active){}
 
 
 
@@ -26,15 +35,24 @@ public class Match {
         this.team2Goals = team2Goals;
     }
 
-    public Team getTeam1()
+    public boolean isActive() { return active; }
+
+    public void setActive(boolean active) { this.active = active; }
+
+    public String getTeam1Name()
     {
-        return team1;
+        return Team1Name;
     }
 
-    public Team getTeam2()
-    {
-        return team2;
-    }
+    public String getTeam2Name(){return Team2name;}
+
+    public Team getTeam1(){return team1;}
+
+    public Team getTeam2(){return team1;}
+
+    public void setTeam1(Team team1) { this.team1 = team1; }
+
+    public void setTeam2(Team team2) { this.team2 = team2; }
 
     public int getTeam1Goals()
     {
@@ -45,6 +63,18 @@ public class Match {
     {
         return team2Goals;
     }
+
+    public void setId(int id) { this.id = id; }
+
+    public void setTournament_id(int tournament_id) { this.tournament_id = tournament_id; }
+
+    public int getId() { return id; }
+
+    public int getTournament_id() { return tournament_id; }
+
+
+
+
 
     @Override
     public String toString() {

@@ -1,44 +1,79 @@
+import javax.sql.DataSource;
 import java.io.*;
 import java.io.FileNotFoundException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static  UI ui;
-
+    //Arraylist that properly should be deleted
     public static ArrayList<Team> teams = new ArrayList<>();
     public static ArrayList<Match> matches = new ArrayList<>();
-    public static ArrayList<Team> currentTeams = new ArrayList<>();
+
+    //ArrayList that may be used
+
+    public static ArrayList<Tournament> tournaments = new ArrayList<>();
+
+    //ArrayList that should be used (currentTeams is for the teams that havent been knockedOut of the tournament yet)
     public static ArrayList<Match> quarterFinals = new ArrayList<>();
     public static ArrayList<Match> Finals = new ArrayList<>();
     public static ArrayList<Match> semifinals = new ArrayList<>();
-    public static ArrayList<Tournament> tournaments = new ArrayList<>();
 
+    public static ArrayList<Team> currentTeams = new ArrayList<>();
+    public static ArrayList<Tournament> DBTournament = new ArrayList<>();
+    public static ArrayList<Team> DBTeams = new ArrayList<>();
+    public static ArrayList<Match> DBMatches = new ArrayList<>();
+    public static ArrayList<Match> currentMatches = new ArrayList<>();
+    public static IO io;
     public static int tourChoose = 0;
+
+
 
     public static void main(String[] args)
     {
+        io = getIo();
 
-        tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
-        continueTournament();
+        DBTournament = io.readTournamentData();
+        DBTeams = io.readTeamData();
+        DBMatches = io.readMatchData();
+        promptNewTour();
         ui = new UI();
         ui.mainInterface();
-        Main.matches.get(0).getTeam1Goals();
+
     }
 
-    public static void continueTournament() {
-        if (teams.size() == 0) {
-            promptNewTour();
-        }
+    public static IO getIo()
+    {
+        return new DBConnector();
     }
+
+
 
     public static void promptNewTour()
     {
+            //Double for loop to place Team in the right Matches
+            for(int p = 0; p < DBMatches.size(); p++)
+            {
+                for(int h = 0; h < DBTeams.size(); h++)
+                {
+                    if (DBTeams.get(h).teamName.equals(DBMatches.get(p).Team1Name))
+                    {
+                        DBMatches.get(p).setTeam1(DBTeams.get(h));
+                    }
+                    else if (DBTeams.get(h).teamName.equals(DBMatches.get(p).Team2name))
+                    {
+                        DBMatches.get(p).setTeam2(DBTeams.get(h));
+                    }
+                }
+            }
+
         Scanner tourInput = new Scanner(System.in);
         System.out.println("\nSaved Tournaments: \n");
         int i = 0;
-        for (Tournament t : tournaments) {
+        for(Tournament t: DBTournament)
+        {
             System.out.println(" "+(i + 1) + "." + t + "\n");
             i++;
         }
@@ -47,53 +82,62 @@ public class Main {
         System.out.print("UserInput: ");
         int input = tourInput.nextInt();
 
-        if (input <= tournaments.size())
+        if (input <= DBTournament.size())
         {
-            if(tournaments.size() > 0)
-            {
-
+                //tourChoose will safe the number of the tournament the user selected and is converted to arraylist format
                 tourChoose = input -1;
 
-                if (tourChoose == 0 && tournaments.size() >= 1)
-                {
-                    matches = readMatchData("src/Matches/match.txt");
-                    teams = readTeamData("src/Teams/Teams1.txt");
-                    copyTeamToCurrent();
-                    tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
-                }
-                else if (tourChoose == 1 && tournaments.size() >= 2)
-                {
-                    matches = readMatchData("src/Matches/match2.txt");
-                    teams = readTeamData("src/Teams/Teams2.txt");
-                    copyTeamToCurrent();
-                    tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
-                }
-                else if (tourChoose == 2 && tournaments.size() >= 3)
-                {
-                    matches = readMatchData("src/Matches/match3.txt");
-                    teams = readTeamData("src/Teams/Teams3.txt");
-                    copyTeamToCurrent();
-                    tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
-                }
-                else if (tourChoose == 3 && tournaments.size() >= 4)
-                {
-                    matches = readMatchData("src/Matches/match4.txt");
-                    teams = readTeamData("src/Teams/Teams4.txt");
-                    copyTeamToCurrent();
-                    tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
-                }
-                else if (tourChoose == 4 && tournaments.size() >= 5)
-                {
-                    matches = readMatchData("src/Matches/match5.txt");
-                    teams = readTeamData("src/Teams/Teams5.txt");
-                    copyTeamToCurrent();
-                    tournaments = readTournamentData("src/Tournaments/Tournaments.txt");
-                }
-                else
+                    //Check if teams has the selected tournaments ID
+                    for(int q = 0; q < DBTeams.size(); q++)
                     {
-                    System.out.println("That is not a valid option");
-                }
-            }
+                        if(DBTeams.get(q).getTournament_id() != DBTournament.get(tourChoose).getId())
+                        {
+                            DBTeams.remove(q);
+                            q--;
+                        }
+                        else if(DBTeams.get(q).getTournament_id() == DBTournament.get(tourChoose).getId())
+                        {
+                            //if team has the selected tournament ID and is not knockout of tournament.
+                            if(DBTeams.get(q).isKnockedOut() == false)
+                            {
+                                currentTeams.add(DBTeams.get(q));
+                            }
+                        }
+                    }
+                    //Check if matches has the selected tournaments ID
+                    for(int j = 0; j < DBMatches.size(); j++)
+                    {
+                        if (DBMatches.get(j).getTournament_id() != DBTournament.get(tourChoose).getId())
+                        {
+                            DBMatches.remove(j);
+                            j--;
+                        }
+                        //if match has the selected tournament ID and is not active false
+                        else if(DBMatches.get(j).getTournament_id() == DBTournament.get(tourChoose).getId())
+                        {
+                            if(DBMatches.get(j).isActive() == true)
+                            {
+                                currentMatches.add(DBMatches.get(j));
+                            }
+                        }
+                    }
+
+                    //thoose for each loops to print out teams and matches is just for safety ATM should be deleted at some time
+                    System.out.println("\nMatches in this tournament:");
+                    for(Match m : DBMatches)
+                    {
+                        System.out.println(m);
+                    }
+                    System.out.println("\nTeams in this tournament:");
+                    for(Team t : DBTeams)
+                    {
+                        System.out.println(t);
+                    }
+                     System.out.println("\nteams that is in currentTeams(Teams who has not been knockOut)");
+                    for(Team g : currentTeams)
+                    {
+                        System.out.println(g);
+                    }
 
         }
         else if(input == i+1)
@@ -107,181 +151,6 @@ public class Main {
             System.out.println("That is not a valid option");
             return;
         }
-
     }
-
-    public static void getCurrentTeams(String getmatchtxt)
-    {
-        if(currentTeams.size() == 0)
-        {
-            matches = readMatchData("src/Matches/match"+ getmatchtxt + ".txt");
-        }
-        else if(currentTeams.size() == 8)
-        {
-            quarterFinals = readMatchData("src/Matches/match" + getmatchtxt + ".txt");
-        }
-        else if(currentTeams.size() == 4)
-        {
-            semifinals =readMatchData("src/Matches/match" + getmatchtxt + ".txt");
-        }
-        else if(currentTeams.size() == 2)
-        {
-            Finals = readMatchData("src/Matches/match" + getmatchtxt + ".txt");
-        }
-    }
-
-    public static void copyTeamToCurrent()
-    {
-        for(int i = 0; i < teams.size(); i++)
-        {
-            if (teams.get(i).knockedOut = false)
-            {
-                currentTeams.add(teams.get(i));
-            }
-        }
-    }
-
-
-    public static String getUserInput(String msg){
-        System.out.print(msg);
-        Scanner scan = new Scanner(System.in);
-        return scan.nextLine();
-    }
-
-    public static ArrayList<Team> readTeamData(String file) {
-        ArrayList<Team> teamList = new ArrayList<>();
-        Scanner scanner = null;
-        File fr = new File(file);
-        try {
-
-            scanner = new Scanner(fr);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (scanner != null)
-        {
-            while(scanner.hasNextLine())
-            {
-                String[] colonSeperatedValues = scanner.nextLine().split(":");
-                String teamName = colonSeperatedValues[0];
-                boolean knockedOut = Boolean.parseBoolean(colonSeperatedValues[1]);
-                teamList.add(new Team(teamName,knockedOut));
-            }
-
-        }
-        scanner.close();
-        return teamList;
-    }
-
-    public static String getGameDataFromSession()
-    {
-        StringBuilder gameData = new StringBuilder();
-        for (Team t : Main.currentTeams)
-        {
-            String teamData = String.format(t.getTeamName()+"\n");
-            gameData.append(teamData);
-        }
-        return gameData.toString();
-    }
-
-    public static String getMatchDataFromSession()
-    {
-        StringBuilder gameData = new StringBuilder();
-        for (Match m : Main.matches)
-        {
-            String matchData = String.format(m.getTeam1() + ":" + m.getTeam2() +":"+m.getTeam1Goals()+":"+m.getTeam2Goals()+"\n");
-            gameData.append(matchData);
-        }
-        return gameData.toString();
-    }
-
-    public static void saveCurrentTeamData() {
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter("src/CurrentTeams.txt");
-            writer.write(getGameDataFromSession());
-        } catch (IOException e) {
-            System.out.println("Couldn't instantiate the FileWriter in saveCurrentTeamData()");
-            e.printStackTrace();
-        } finally {
-            try {
-                writer.close();
-            } catch (NullPointerException | IOException e) {
-                System.out.println("Couldn't close the FileWriter in saveCurrentTeamData()");
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    public static ArrayList<Match> readMatchData(String file) {
-        ArrayList<Match> matchList = new ArrayList<>();
-        Scanner scanner = null;
-        File fr = new File(file);
-        try {
-
-            scanner = new Scanner(fr);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (scanner != null) {
-            while (scanner.hasNextLine()) {
-                Team team1 = new Team("teamName",false);
-                Team team2 = new Team("teamName",false);
-
-                String[] colonSeperatedValues = scanner.nextLine().split(":");
-                team1.setTeamName(colonSeperatedValues[0]);
-                team2.setTeamName(colonSeperatedValues[1]);
-
-                int i =0;
-                while(i < currentTeams.size()) {
-                    if (currentTeams.get(i).equals(team1.getTeamName()))
-                    {
-                        team1 = currentTeams.get(i);
-                    }
-                    if (currentTeams.get(i).equals(team2.getTeamName()))
-                    {
-                        team2 = currentTeams.get(i);
-                    }
-                    i++;
-                }
-
-
-                int team1Goal = Integer.parseInt(colonSeperatedValues[2]);
-                int team2Goal = Integer.parseInt(colonSeperatedValues[3]);
-                matchList.add(new Match(team1,team2,team1Goal,team2Goal));
-            }
-        }
-        scanner.close();
-        return matchList;
-    }
-
-    public static ArrayList<Tournament> readTournamentData(String file) {
-        ArrayList<Tournament> tournamentList = new ArrayList<>();
-        Scanner scanner = null;
-        File fr = new File(file);
-        try {
-
-            scanner = new Scanner(fr);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (scanner != null) {
-            while (scanner.hasNextLine())
-            {
-                   String tourName = scanner.nextLine();
-
-                tournamentList.add(new Tournament(tourName,matches,teams,currentTeams));
-            }
-
-        }
-        scanner.close();
-        return tournamentList;
-    }
-
-
 
 }

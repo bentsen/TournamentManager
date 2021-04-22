@@ -10,10 +10,12 @@ public class Team {
     int points;
     boolean knockedOut = false;
     UI ui;
+    private int tournament_id;
 
-    public Team(String teamName, boolean knockedOut){
+    public Team(String teamName, boolean knockedOut, int tournament_id){
         this.teamName = teamName;
         this.knockedOut = knockedOut;
+        this.tournament_id = tournament_id;
 
     }
 
@@ -37,13 +39,13 @@ public class Team {
         this.knockedOut = knockedOut;
     }
 
-    public void getPlacement(){
+    public void getPlacement(){ }
 
-    }
+    public void setPlacement(){ }
 
-    public void setPlacement(){
+    public void setTournament_id(int tournament_id) { this.tournament_id = tournament_id; }
 
-    }
+    public int getTournament_id() { return tournament_id; }
 
     public boolean isKnockedOut() {
         return knockedOut;

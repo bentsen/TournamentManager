@@ -14,7 +14,7 @@ public class Controller
     public boolean tournamentCreated = false;
 
 
-    public void registerTeam()
+    public void registerTeam() //Skal laves om så den gemmer hold der er i DataBase(Har vi ikke lært ordenligt endnu)
     {
 
         System.out.println("Write your team name");
@@ -25,7 +25,7 @@ public class Controller
 
         try
         {
-            Team team = new Team(teamName,false);
+            Team team = new Team(teamName,false,1);
             Main.teams.add(team);
             Writer output;
             if(Main.tourChoose > 0)
@@ -38,7 +38,7 @@ public class Controller
             }
             else if(tournamentCreated == true)
             {
-                int index = Main.tournaments.indexOf(tournament);
+                int index = Main.DBTournament.indexOf(tournament);
                 output = new BufferedWriter(new FileWriter("src/Teams/Teams" + (index+1) + ".txt", true ));
                 output.append("\n");
                 output.append(teamName + ":" + knockout);
@@ -58,7 +58,7 @@ public class Controller
 
     }
 
-    public void deleteTeam()        //Viker ikke
+    public void deleteTeam()     //Virker ikke skal først finde ud af hvordan man sletter noget fra DataBasen
     {
         //Removes team from arraylist
         //todo make it remove from txt file too
@@ -82,6 +82,7 @@ public class Controller
     }
 
     public void randomMatchUps(ArrayList<Team> randomTeams, ArrayList<Match> randomMatch) // creates random match-ups of the teams
+            // VIRKER IKKE KAN FØRST VIRKE NÅR JEG KAN SRKIVE TIL SERVEREN
     {
         ArrayList<Team> teamsList = new ArrayList<>();
         teamsList = randomTeams;
@@ -92,20 +93,21 @@ public class Controller
             Team team2;
             team1 = teamsList.get(i);
             team2 = teamsList.get(i+1);
-            Match match = new Match(team1,team2, 0, 0);
+            //create new matches with the ID of tourChoose which is the tournament that was choosen
+            Match match = new Match(team1,team2, Main.tourChoose, Main.tourChoose,0,0,true);
             randomMatch.add(match);
-            saveMatchData();
+            //her skal der laves så man gemmer ny nye kampe der er blevet lavet.
             System.out.println("A match between " + team1 + " and " + team2 + " has now been created");
         }
 
     }
 
-    public void allTeams()
+    public void allTeams() //er opdateret og virker :)
     {
-        System.out.println("Enrolled teams ");
-        for (Team c : Main.teams)
+        System.out.println("\nEnrolled teams:");
+        for (Team c : Main.DBTeams)
         {
-            System.out.println(c);
+            System.out.println("-"+c);
         }
 
         return;
@@ -117,7 +119,6 @@ public class Controller
         while(matches.size() > i)
         {
             Match match = matches.get(i);
-
             //set teams that lose to have boolean true knockOut
             if (match.getTeam1Goals() > match.getTeam2Goals()) {
                 match.getTeam2().setKnockedOut(true);
@@ -125,21 +126,30 @@ public class Controller
                 match.getTeam1().setKnockedOut(true);
 
             }
-
             //Removes teams that lose a knockOut game
             if (match.getTeam1().isKnockedOut() == true) {
                 Main.currentTeams.remove(match.getTeam1());
             } else if (match.getTeam2().isKnockedOut() == true) {
                 Main.currentTeams.remove(match.getTeam2());
             }
+            //set the matches that just got simulated to false in active
+            match.setActive(false);
             i++;
 
         }
-        if (Main.currentTeams.size() > 1) {
-            System.out.println("Qualified teams: " + Main.currentTeams + "\n");
-            Main.saveCurrentTeamData();
+        //removes the matches from currentMatches
+        for(int p = 0; p < Main.currentMatches.size(); p++)
+        {
+            Main.currentMatches.remove(p);
+        }
 
-        } else if (Main.currentTeams.size() <= 1) {
+        if (Main.currentTeams.size() > 1)
+        {
+            System.out.println("Qualified teams: " + Main.currentTeams + "\n");
+            //Main.saveCurrentTeamData();
+
+        } else if (Main.currentTeams.size() <= 1)
+        {
             System.out.println("\n" + "The winner of the tournament is " + Main.currentTeams + "\n");
         }
 
@@ -212,7 +222,7 @@ public class Controller
         }
     }
 
-    public void createTournament()
+    public void createTournament() //VIRKER IKKE KAN FØRST VIRKE NÅR JEG KAN SRKIVE TIL SERVEREN
     {
         if(Main.tourChoose > 0) {
             if (Main.tournaments.size() < 6) {
@@ -253,7 +263,7 @@ public class Controller
 
     }
 
-    public void deleteTournament() 
+    public void deleteTournament() //VIRKER IKKE KAN FØRST VIRKE NÅR JEG VED HVORDAN MAN SLETTER DATA FRA SERVEREN HERFRA
     {
         int i = 0;
         System.out.println("\nTOURNAMENTS:\n");
@@ -360,13 +370,13 @@ public class Controller
             if(Main.tourChoose > 0)
             {
                 writer = new FileWriter("src/Matches/match"+Main.tourChoose+".txt");
-                writer.write(Main.getMatchDataFromSession());
+               // writer.write(Main.getMatchDataFromSession());
             }
             else if(tournamentCreated == true)
             {
                 int index = Main.tournaments.indexOf(tournament);
                 writer = new FileWriter("src/Matches/match"+(index+1)+".txt");
-                writer.write(Main.getMatchDataFromSession());
+                //writer.write(Main.getMatchDataFromSession());
             }
             else
             {
@@ -385,27 +395,40 @@ public class Controller
         }
     }
 
-    public void tournamentSchedule()
+    public void tournamentSchedule() //VIRKER MEN KAN FORBEDRES
     {
-        for(int i = 0; i < Main.matches.size(); i++)
-        {
-            System.out.println("\nMatch " + (i+1)+ " " +Main.matches.get(i).getTeam1() + " vs " +
-                    Main.matches.get(i).getTeam2() + " " + Main.matches.get(i).getTeam1Goals() + "-" +
-                    Main.matches.get(i).getTeam2Goals());
+        System.out.println("\nPreviously played matches");
+        for(int i = 0; i < Main.DBMatches.size(); i++) {
+            if (Main.DBMatches.get(i).getTeam1Goals() > 0 || Main.DBMatches.get(i).getTeam2Goals() > 0) {
+                System.out.println("Match " + (i + 1) + " " + Main.DBMatches.get(i).getTeam1() + " vs " +
+                        Main.DBMatches.get(i).getTeam2() + " " + Main.DBMatches.get(i).getTeam1Goals() + "-" +
+                        Main.DBMatches.get(i).getTeam2Goals());
+            }
+
+        }
+        System.out.println("\nOngoing Matches:");
+        for(int j = 0; j < Main.DBMatches.size(); j++) {
+            if (Main.DBMatches.get(j).getTeam1Goals() == 0 && Main.DBMatches.get(j).getTeam2Goals() == 0)
+            {
+
+                System.out.println("Match " + (j + 1) + " " + Main.DBMatches.get(j).getTeam1() + " vs " +
+                        Main.DBMatches.get(j).getTeam2() + " " + Main.DBMatches.get(j).getTeam1Goals() + "-" +
+                        Main.DBMatches.get(j).getTeam2Goals());
+            }
         }
 
     }
 
-    public void tournamentSim() {
-
+    public void tournamentSim()
+    {
         message();
 
-        if(Main.currentTeams.size() == 0) {
-            Main.currentTeams = Main.teams;
-            teamExecute(Main.matches);
+        if(Main.currentTeams.size() == 16) {
+            Main.currentTeams = Main.DBTeams;
+            teamExecute(Main.DBMatches);
         }
         else if(Main.currentTeams.size() == 8) {
-            teamExecute(Main.quarterFinals);
+            teamExecute(Main.DBMatches);
         }
         else if(Main.currentTeams.size() == 4) {
             teamExecute(Main.semifinals);
