@@ -14,7 +14,7 @@ public class UI
         System.out.println(" 1.Team menu");
         System.out.println(" 2.Match menu");
         System.out.println(" 3.Tournament menu");
-        System.out.println(" 4.Exit");
+        System.out.println(" 4.Exit and save");
         System.out.print("\nUserInput: ");
         userInput = interfaceScan.nextInt();
 
@@ -31,6 +31,8 @@ public class UI
                 break;
 
             case 4:
+                Main.io.saveTeamData();
+                Main.io.saveMatchData();
                 System.exit(0);
             default:
                 System.out.println("not a valid option");
@@ -86,7 +88,7 @@ public class UI
         switch (userInput)
         {
             case 1:
-                if(Main.currentTeams.size() == 0) {
+                if(Main.currentTeams.size() == 16) {
                     data.randomMatchUps(Main.DBTeams, Main.DBMatches);
                 }
                 else if(Main.currentTeams.size() == 8) {

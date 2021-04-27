@@ -25,8 +25,9 @@ public class Controller
 
         try
         {
-            Team team = new Team(teamName,false,1);
-            Main.teams.add(team);
+            Team team = new Team(teamName,false,Main.tourChoose+1,1);
+            Main.DBTeams.add(team);
+            Main.DBAllTeams.add(team);
             Writer output;
             if(Main.tourChoose > 0)
             {
@@ -55,6 +56,7 @@ public class Controller
             System.out.println("Something went wrong");
         }
         System.out.println("Welcome to the tournament " + teamName + " Your team has now been registered");
+
 
     }
 
@@ -94,8 +96,10 @@ public class Controller
             team1 = teamsList.get(i);
             team2 = teamsList.get(i+1);
             //create new matches with the ID of tourChoose which is the tournament that was choosen
-            Match match = new Match(team1,team2, Main.tourChoose, Main.tourChoose,0,0,true);
+            Match match = new Match(team1,team2,Main.tourChoose+1,0,0,true);
             randomMatch.add(match);
+            Match matchCopy = new Match(team1.getTeamName(),team2.getTeamName(),Main.tourChoose+1,0,0,true);
+            Main.DBAllMatches.add(matchCopy);
             //her skal der laves så man gemmer ny nye kampe der er blevet lavet.
             System.out.println("A match between " + team1 + " and " + team2 + " has now been created");
         }

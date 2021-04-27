@@ -13,7 +13,7 @@ public class Match {
     int tournament_id;
     boolean active = true;
 
-    public Match(String Team1Name, String Team2name, int id ,int tournament_id, int team1Goals, int team2Goals,boolean active)
+    public Match(String Team1Name, String Team2name,int tournament_id, int team1Goals, int team2Goals,boolean active)
     {
         this.active = active;
         this.Team1Name = Team1Name;
@@ -23,7 +23,7 @@ public class Match {
         this.team2Goals = team2Goals;
     }
 
-    public Match(Team Team1Name, Team Team2name, int id ,int tournament_id, int team1Goals, int team2Goals,boolean active){}
+    public Match(Team Team1Name, Team Team2name, int tournament_id, int team1Goals, int team2Goals,boolean active){}
 
 
 
@@ -71,6 +71,8 @@ public class Match {
     public int getId() { return id; }
 
     public int getTournament_id() { return tournament_id; }
+
+
 
 
 

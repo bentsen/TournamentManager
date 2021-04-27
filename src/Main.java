@@ -24,6 +24,8 @@ public class Main {
     public static ArrayList<Team> currentTeams = new ArrayList<>();
     public static ArrayList<Tournament> DBTournament = new ArrayList<>();
     public static ArrayList<Team> DBTeams = new ArrayList<>();
+    public static ArrayList<Team> DBAllTeams = new ArrayList<>();
+    public static ArrayList<Match> DBAllMatches = new ArrayList<>();
     public static ArrayList<Match> DBMatches = new ArrayList<>();
     public static ArrayList<Match> currentMatches = new ArrayList<>();
     public static IO io;
@@ -38,6 +40,8 @@ public class Main {
         DBTournament = io.readTournamentData();
         DBTeams = io.readTeamData();
         DBMatches = io.readMatchData();
+        DBAllTeams = io.readTeamData();
+        DBAllMatches = io.readMatchData();
         promptNewTour();
         ui = new UI();
         ui.mainInterface();

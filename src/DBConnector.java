@@ -1,3 +1,5 @@
+import com.sun.security.jgss.GSSUtil;
+
 import java.util.ArrayList;
 import java.sql.*;
 public class DBConnector implements IO
@@ -111,7 +113,7 @@ public class DBConnector implements IO
                 System.out.print(" | Match-ID: " + match_id);
                 System.out.print(" | TeamName: " + teamName);
                 System.out.println(" | TeamknockOut: " + knockOut);
-                Team team = new Team(teamName,knockOut,tournament_id);
+                Team team = new Team(teamName,knockOut,tournament_id,match_id);
                 teamList.add(team);
 
 
@@ -185,7 +187,8 @@ public class DBConnector implements IO
                 System.out.println(" | Team2Goals: " + goal2);
                 System.out.println(" | active: " + active);
 
-                Match match = new Match(team1,team2,id,tournament_id,goal1,goal2,active);
+                Match match = new Match(team1,team2,tournament_id,goal1,goal2,active);
+                match.setId(id);
                 matchList.add(match);
 
 
@@ -216,5 +219,105 @@ public class DBConnector implements IO
         }//end try
 
         return matchList;
+    }
+
+    @Override
+    public void saveTeamData()
+    {
+        ResultSet rs = null;
+        Connection conn = null;
+        //Statement stmt = null;
+
+        String sql = "INSERT INTO Teams (tournament_id, match_id, name, knockOut)"
+                + " VALUES(?,?,?,?)";
+
+
+        try
+        {
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+
+            //STEP 2: Execute a query
+            System.out.println("Creating statement...");
+            //  stmt = conn.createStatement();
+
+            for (int i = 0; i < Main.DBAllTeams.size(); i++)
+            {
+                System.out.println("JEG ER INDE ");
+                pstmt.setInt(1, Main.DBAllTeams.get(i).getTournament_id());
+                pstmt.setInt(2, Main.DBAllTeams.get(i).getMatch_id());
+                pstmt.setString(3, Main.DBAllTeams.get(i).getTeamName());
+                pstmt.setBoolean(4, Main.DBAllTeams.get(i).isKnockedOut());
+
+                pstmt.addBatch();
+            }
+
+
+            pstmt.executeBatch();
+
+
+        } catch (SQLException ex)
+        {
+            System.out.println(ex.getMessage());
+        }finally {
+            try{
+                if(rs != null) rs.close();
+            }catch (SQLException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        System.out.println("statement Done");
+    }
+
+    @Override
+    public void saveMatchData()
+    {
+        ResultSet rs = null;
+        Connection conn = null;
+        //Statement stmt = null;
+
+        String sql = "INSERT INTO Matches (tournament_id, team1, team2 , goal1, goal2, active)"
+                + " VALUES(?,?,?,?,?,?)";
+
+
+        try
+        {
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+
+            //STEP 2: Execute a query
+            System.out.println("Creating statement...");
+            //  stmt = conn.createStatement();
+
+            for (int i = 0; i < Main.DBAllMatches.size(); i++)
+            {
+                System.out.println("JEG ER INDE ");
+                pstmt.setInt(1, Main.DBAllMatches.get(i).getTournament_id());
+                pstmt.setString(2, Main.DBAllMatches.get(i).getTeam1Name());
+                pstmt.setString(3, Main.DBAllMatches.get(i).getTeam2Name());
+                pstmt.setInt(4, Main.DBAllMatches.get(i).getTeam1Goals());
+                pstmt.setInt(5, Main.DBAllMatches.get(i).getTeam2Goals());
+                pstmt.setBoolean(6, Main.DBAllMatches.get(i).isActive());
+
+                pstmt.addBatch();
+            }
+
+
+            pstmt.executeBatch();
+
+
+        } catch (SQLException ex)
+        {
+            System.out.println(ex.getMessage());
+        }finally {
+            try{
+                if(rs != null) rs.close();
+            }catch (SQLException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        System.out.println("statement Done");
     }
 }

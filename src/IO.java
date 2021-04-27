@@ -5,4 +5,6 @@ public interface IO
     public ArrayList<Tournament> readTournamentData();
     public ArrayList<Team> readTeamData();
     public ArrayList<Match> readMatchData();
+    public void saveTeamData();
+    public void saveMatchData();
 }
